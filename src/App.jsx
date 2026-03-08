@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import MapView from "./MapView.jsx";
 
 const C = {
   purple:"#3B0764", purpleMid:"#5B21B6", purpleLight:"#7C3AED",
@@ -20,33 +21,33 @@ const CATEGORIES = [
 ];
 const ALL_CATS = [{ id:"all", label:"All", icon:"✦" }, ...CATEGORIES];
 
-// ── All Events (BR-wide + LSU area) ──────────────────────────────────────────
+// Baton Rouge ~30.45, -91.19; LSU ~30.41, -91.18 — real lat/lng for map
 const EVENTS = [
   // Downtown / General BR
-  { id:1,  category:"music",    lsu:false, title:"Red Stick Revel Music Festival",  date:"Mar 14–16", time:"5:00 PM",  location:"Shaw Center for the Arts",           distance:"2.4 mi", hot:true,  desc:"Three days of live music across 4 stages featuring indie, jazz, and blues from across Louisiana.", color:"#7C3AED", lat:128, lng:195 },
-  { id:2,  category:"food",     lsu:false, title:"Boudin & Cracklins Cook-Off",     date:"Mar 22",    time:"11:00 AM", location:"Repentance Park",                    distance:"2.8 mi", hot:false, desc:"Taste the best Cajun boudin and cracklins in the parish. 30+ competitors, live zydeco, cold beer.", color:"#B7860B", lat:108, lng:158 },
-  { id:3,  category:"run",      lsu:false, title:"Mardi Gras Half Marathon",        date:"Mar 29",    time:"7:00 AM",  location:"Downtown Baton Rouge",               distance:"3.1 mi", hot:true,  desc:"Run through the heart of BR in beads and costumes! 5K, 10K, and half marathon distances.", color:"#059669", lat:115, lng:172 },
-  { id:4,  category:"festival", lsu:false, title:"FestForAll Arts & Crafts",        date:"Apr 5–6",   time:"10:00 AM", location:"Perkins Road Community Park",        distance:"1.2 mi", hot:false, desc:"Louisiana's largest juried arts & crafts festival with 300+ artisans, food, and family fun.", color:"#DB2777", lat:248, lng:222 },
-  { id:5,  category:"art",      lsu:false, title:"Emerge Gallery Opening Night",    date:"Apr 3",     time:"7:00 PM",  location:"Emerge Gallery & Art Center",        distance:"1.8 mi", hot:false, desc:"Opening reception showcasing emerging Louisiana visual artists. Wine, jazz, hors d'oeuvres.", color:"#0891B2", lat:198, lng:202 },
-  { id:6,  category:"bar",      lsu:false, title:"Baton Rouge Trivia Crawl",        date:"Mar 21",    time:"6:30 PM",  location:"Perkins Row Entertainment District", distance:"1.5 mi", hot:true,  desc:"Team trivia across 5 bars — winners get BR-wide bragging rights and a $500 bar tab.", color:"#EA580C", lat:218, lng:178 },
-  { id:7,  category:"food",     lsu:false, title:"Louisiana Seafood Festival",      date:"Apr 12–13", time:"12:00 PM", location:"Raising Cane's River Center",        distance:"3.0 mi", hot:true,  desc:"Crawfish, shrimp, oysters and more. Cooking demos, live music, fresh Gulf seafood.", color:"#B7860B", lat:95,  lng:155 },
-  { id:8,  category:"music",    lsu:false, title:"Blues on the Bluffs",             date:"Apr 19",    time:"4:00 PM",  location:"Baton Rouge Blues Park",             distance:"3.8 mi", hot:false, desc:"Outdoor blues on the Mississippi bluffs with legendary local and national acts.", color:"#7C3AED", lat:82,  lng:175 },
-  { id:19, category:"openmic", lsu:false, title:"Downtown Open Mic Night",          date:"Mar 18",    time:"8:00 PM",  location:"Chelsea's Live, Baton Rouge",         distance:"2.2 mi", hot:false, desc:"Singers, poets, and comedians take the stage every Tuesday. Sign up at the door. No cover.", color:"#E11D48", lat:125, lng:168 },
-  { id:20, category:"openmic", lsu:false, title:"Red Stick Poetry Slam",             date:"Apr 9",     time:"7:00 PM",  location:"Mid City Ballroom",                    distance:"1.6 mi", hot:false, desc:"Monthly spoken word and poetry slam. Cash prizes. All ages welcome. Louisiana's finest wordsmiths.", color:"#E11D48", lat:205, lng:185 },
+  { id:1,  category:"music",    lsu:false, title:"Red Stick Revel Music Festival",  date:"Mar 14–16", time:"5:00 PM",  location:"Shaw Center for the Arts",           distance:"2.4 mi", hot:true,  desc:"Three days of live music across 4 stages featuring indie, jazz, and blues from across Louisiana.", color:"#7C3AED", lat:30.4496, lng:-91.1882 },
+  { id:2,  category:"food",     lsu:false, title:"Boudin & Cracklins Cook-Off",     date:"Mar 22",    time:"11:00 AM", location:"Repentance Park",                    distance:"2.8 mi", hot:false, desc:"Taste the best Cajun boudin and cracklins in the parish. 30+ competitors, live zydeco, cold beer.", color:"#B7860B", lat:30.4520, lng:-91.1520 },
+  { id:3,  category:"run",      lsu:false, title:"Mardi Gras Half Marathon",        date:"Mar 29",    time:"7:00 AM",  location:"Downtown Baton Rouge",               distance:"3.1 mi", hot:true,  desc:"Run through the heart of BR in beads and costumes! 5K, 10K, and half marathon distances.", color:"#059669", lat:30.4515, lng:-91.1871 },
+  { id:4,  category:"festival", lsu:false, title:"FestForAll Arts & Crafts",        date:"Apr 5–6",   time:"10:00 AM", location:"Perkins Road Community Park",        distance:"1.2 mi", hot:false, desc:"Louisiana's largest juried arts & crafts festival with 300+ artisans, food, and family fun.", color:"#DB2777", lat:30.3780, lng:-91.0330 },
+  { id:5,  category:"art",      lsu:false, title:"Emerge Gallery Opening Night",    date:"Apr 3",     time:"7:00 PM",  location:"Emerge Gallery & Art Center",        distance:"1.8 mi", hot:false, desc:"Opening reception showcasing emerging Louisiana visual artists. Wine, jazz, hors d'oeuvres.", color:"#0891B2", lat:30.4480, lng:-91.1850 },
+  { id:6,  category:"bar",      lsu:false, title:"Baton Rouge Trivia Crawl",        date:"Mar 21",    time:"6:30 PM",  location:"Perkins Row Entertainment District", distance:"1.5 mi", hot:true,  desc:"Team trivia across 5 bars — winners get BR-wide bragging rights and a $500 bar tab.", color:"#EA580C", lat:30.4220, lng:-91.0980 },
+  { id:7,  category:"food",     lsu:false, title:"Louisiana Seafood Festival",      date:"Apr 12–13", time:"12:00 PM", location:"Raising Cane's River Center",        distance:"3.0 mi", hot:true,  desc:"Crawfish, shrimp, oysters and more. Cooking demos, live music, fresh Gulf seafood.", color:"#B7860B", lat:30.4472, lng:-91.1910 },
+  { id:8,  category:"music",    lsu:false, title:"Blues on the Bluffs",             date:"Apr 19",    time:"4:00 PM",  location:"Baton Rouge Blues Park",             distance:"3.8 mi", hot:false, desc:"Outdoor blues on the Mississippi bluffs with legendary local and national acts.", color:"#7C3AED", lat:30.4620, lng:-91.2000 },
+  { id:19, category:"openmic", lsu:false, title:"Downtown Open Mic Night",          date:"Mar 18",    time:"8:00 PM",  location:"Chelsea's Live, Baton Rouge",         distance:"2.2 mi", hot:false, desc:"Singers, poets, and comedians take the stage every Tuesday. Sign up at the door. No cover.", color:"#E11D48", lat:30.4420, lng:-91.1795 },
+  { id:20, category:"openmic", lsu:false, title:"Red Stick Poetry Slam",             date:"Apr 9",     time:"7:00 PM",  location:"Mid City Ballroom",                    distance:"1.6 mi", hot:false, desc:"Monthly spoken word and poetry slam. Cash prizes. All ages welcome. Louisiana's finest wordsmiths.", color:"#E11D48", lat:30.4210, lng:-91.0980 },
 
   // ── LSU Area Events ────────────────────────────────────────────────────────
-  { id:9,  category:"tailgate", lsu:true,  title:"Tiger Stadium Tailgate Party",    date:"Mar 15",    time:"2:00 PM",  location:"Tiger Stadium Lots, LSU Campus",     distance:"0.4 mi", hot:true,  desc:"The biggest tailgate on the bayou. Live brass band, crawfish boil, purple & gold everything. Geaux Tigers!", color:"#461D7C", lat:318, lng:192 },
-  { id:10, category:"music",    lsu:true,  title:"Free Speech Alley Live",          date:"Mar 20",    time:"12:00 PM", location:"Free Speech Alley, LSU",             distance:"0.2 mi", hot:false, desc:"Local and up-and-coming bands perform live on LSU's iconic Free Speech Alley. Bring a blanket and lunch.", color:"#7C3AED", lat:305, lng:175 },
-  { id:11, category:"food",     lsu:true,  title:"The Parade Food Truck Rally",     date:"Mar 28",    time:"5:00 PM",  location:"The Parade, LSU Campus",             distance:"0.3 mi", hot:true,  desc:"20+ food trucks lined up on The Parade. From boudin balls to bubble tea — the ultimate campus street food night.", color:"#B7860B", lat:295, lng:210 },
-  { id:12, category:"run",      lsu:true,  title:"Tiger Trot 5K",                   date:"Apr 6",     time:"7:30 AM",  location:"LSU Lakes, Baton Rouge",             distance:"0.5 mi", hot:false, desc:"A scenic 5K around the beautiful LSU Lakes. All fitness levels welcome. Post-race crawfish breakfast included!", color:"#059669", lat:338, lng:165 },
-  { id:13, category:"bar",      lsu:true,  title:"Tigerland Bar Crawl",             date:"Apr 11",    time:"8:00 PM",  location:"Tigerland, Baton Rouge",             distance:"0.6 mi", hot:true,  desc:"Hit every legendary Tigerland bar in one epic crawl. Drink specials, costume contest, DJ at every stop.", color:"#EA580C", lat:355, lng:195 },
-  { id:21, category:"bar",      lsu:true,  title:"Fred's Tailgate Thursday",        date:"Mar 27",    time:"5:00 PM",  location:"Fred's on the River, Tigerland",      distance:"0.5 mi", hot:true,  desc:"LSU game-day vibes every Thursday. $3 domestics, live DJ, crawfish when in season. Purple & gold crowd.", color:"#EA580C", lat:348, lng:200 },
-  { id:22, category:"openmic", lsu:true,  title:"LSU Union Open Mic Night",         date:"Mar 24",    time:"7:00 PM",  location:"LSU Student Union, Free Speech Alley", distance:"0.2 mi", hot:false, desc:"Students and locals share music, comedy, and poetry. First-come sign-up. Free and open to all.", color:"#E11D48", lat:308, lng:178 },
-  { id:14, category:"art",      lsu:true,  title:"LSU Student Art Showcase",        date:"Apr 4",     time:"6:00 PM",  location:"LSU Museum of Art, Shaw Center",     distance:"0.4 mi", hot:false, desc:"Annual showcase of LSU fine arts students. Paintings, sculpture, digital art, and live performance pieces.", color:"#0891B2", lat:325, lng:215 },
-  { id:15, category:"festival", lsu:true,  title:"Highland Road Festival",          date:"Apr 18–19", time:"10:00 AM", location:"Highland Road Park",                 distance:"0.7 mi", hot:true,  desc:"Family-friendly arts, crafts and music festival along the iconic Highland Road corridor near LSU.", color:"#DB2777", lat:342, lng:240 },
-  { id:16, category:"music",    lsu:true,  title:"Bluegrass on the Bayou",          date:"Apr 25",    time:"4:00 PM",  location:"LSU Lakes Amphitheater",             distance:"0.5 mi", hot:false, desc:"Sunset bluegrass session by the LSU Lakes. Local bands, craft beer garden, food vendors. Dogs welcome!", color:"#7C3AED", lat:360, lng:175 },
-  { id:17, category:"social",   lsu:true,  title:"Campus Comedy Night",             date:"Mar 26",    time:"7:30 PM",  location:"LSU Student Union Theater",          distance:"0.3 mi", hot:false, desc:"Stand-up comedy showcase featuring LSU students and a headlining Louisiana comedian. Free admission.", color:"#9333EA", lat:312, lng:198 },
-  { id:18, category:"food",     lsu:true,  title:"Cajun Cookoff at the PMAC",       date:"Apr 8",     time:"11:00 AM", location:"Pete Maravich Assembly Center",       distance:"0.4 mi", hot:true,  desc:"Parish-wide gumbo and jambalaya cookoff. Student orgs, local restaurants, and campus chefs all competing.", color:"#B7860B", lat:330, lng:182 },
+  { id:9,  category:"tailgate", lsu:true,  title:"Tiger Stadium Tailgate Party",    date:"Mar 15",    time:"2:00 PM",  location:"Tiger Stadium Lots, LSU Campus",     distance:"0.4 mi", hot:true,  desc:"The biggest tailgate on the bayou. Live brass band, crawfish boil, purple & gold everything. Geaux Tigers!", color:"#461D7C", lat:30.4120, lng:-91.1837 },
+  { id:10, category:"music",    lsu:true,  title:"Free Speech Alley Live",          date:"Mar 20",    time:"12:00 PM", location:"Free Speech Alley, LSU",             distance:"0.2 mi", hot:false, desc:"Local and up-and-coming bands perform live on LSU's iconic Free Speech Alley. Bring a blanket and lunch.", color:"#7C3AED", lat:30.4145, lng:-91.1795 },
+  { id:11, category:"food",     lsu:true,  title:"The Parade Food Truck Rally",     date:"Mar 28",    time:"5:00 PM",  location:"The Parade, LSU Campus",             distance:"0.3 mi", hot:true,  desc:"20+ food trucks lined up on The Parade. From boudin balls to bubble tea — the ultimate campus street food night.", color:"#B7860B", lat:30.4130, lng:-91.1810 },
+  { id:12, category:"run",      lsu:true,  title:"Tiger Trot 5K",                   date:"Apr 6",     time:"7:30 AM",  location:"LSU Lakes, Baton Rouge",             distance:"0.5 mi", hot:false, desc:"A scenic 5K around the beautiful LSU Lakes. All fitness levels welcome. Post-race crawfish breakfast included!", color:"#059669", lat:30.4180, lng:-91.1780 },
+  { id:13, category:"bar",      lsu:true,  title:"Tigerland Bar Crawl",             date:"Apr 11",    time:"8:00 PM",  location:"Tigerland, Baton Rouge",             distance:"0.6 mi", hot:true,  desc:"Hit every legendary Tigerland bar in one epic crawl. Drink specials, costume contest, DJ at every stop.", color:"#EA580C", lat:30.4040, lng:-91.1750 },
+  { id:21, category:"bar",      lsu:true,  title:"Fred's Tailgate Thursday",        date:"Mar 27",    time:"5:00 PM",  location:"Fred's on the River, Tigerland",      distance:"0.5 mi", hot:true,  desc:"LSU game-day vibes every Thursday. $3 domestics, live DJ, crawfish when in season. Purple & gold crowd.", color:"#EA580C", lat:30.4035, lng:-91.1745 },
+  { id:22, category:"openmic", lsu:true,  title:"LSU Union Open Mic Night",         date:"Mar 24",    time:"7:00 PM",  location:"LSU Student Union, Free Speech Alley", distance:"0.2 mi", hot:false, desc:"Students and locals share music, comedy, and poetry. First-come sign-up. Free and open to all.", color:"#E11D48", lat:30.4145, lng:-91.1795 },
+  { id:14, category:"art",      lsu:true,  title:"LSU Student Art Showcase",        date:"Apr 4",     time:"6:00 PM",  location:"LSU Museum of Art, Shaw Center",     distance:"0.4 mi", hot:false, desc:"Annual showcase of LSU fine arts students. Paintings, sculpture, digital art, and live performance pieces.", color:"#0891B2", lat:30.4496, lng:-91.1882 },
+  { id:15, category:"festival", lsu:true,  title:"Highland Road Festival",          date:"Apr 18–19", time:"10:00 AM", location:"Highland Road Park",                 distance:"0.7 mi", hot:true,  desc:"Family-friendly arts, crafts and music festival along the iconic Highland Road corridor near LSU.", color:"#DB2777", lat:30.3950, lng:-91.0950 },
+  { id:16, category:"music",    lsu:true,  title:"Bluegrass on the Bayou",          date:"Apr 25",    time:"4:00 PM",  location:"LSU Lakes Amphitheater",             distance:"0.5 mi", hot:false, desc:"Sunset bluegrass session by the LSU Lakes. Local bands, craft beer garden, food vendors. Dogs welcome!", color:"#7C3AED", lat:30.4185, lng:-91.1775 },
+  { id:17, category:"social",   lsu:true,  title:"Campus Comedy Night",             date:"Mar 26",    time:"7:30 PM",  location:"LSU Student Union Theater",          distance:"0.3 mi", hot:false, desc:"Stand-up comedy showcase featuring LSU students and a headlining Louisiana comedian. Free admission.", color:"#9333EA", lat:30.4145, lng:-91.1795 },
+  { id:18, category:"food",     lsu:true,  title:"Cajun Cookoff at the PMAC",       date:"Apr 8",     time:"11:00 AM", location:"Pete Maravich Assembly Center",       distance:"0.4 mi", hot:true,  desc:"Parish-wide gumbo and jambalaya cookoff. Student orgs, local restaurants, and campus chefs all competing.", color:"#B7860B", lat:30.4115, lng:-91.1845 },
 ];
 
 const NOTIFS = [
@@ -168,68 +169,6 @@ function Onboarding({ onDone }) {
       {step>0&&<div style={{position:"fixed",bottom:50,display:"flex",gap:10,zIndex:2}}>
         {[1,2].map(i=><div key={i} style={{width:step===i?24:8,height:8,borderRadius:99,background:step===i?C.gold:"rgba(245,197,24,.2)",transition:"all .3s"}}/>)}
       </div>}
-    </div>
-  );
-}
-
-// ── Map View ──────────────────────────────────────────────────────────────────
-function MapView({ events, onPick }) {
-  const [hov, setHov] = useState(null);
-  const river=[{x:55,y:50},{x:65,y:85},{x:58,y:118},{x:68,y:148},{x:56,y:178},{x:63,y:210},{x:55,y:240},{x:60,y:270}];
-  const roads=[
-    {x1:85,y1:90,x2:340,y2:90},{x1:85,y1:140,x2:340,y2:140},{x1:85,y1:190,x2:340,y2:190},
-    {x1:85,y1:240,x2:340,y2:240},{x1:85,y1:290,x2:340,y2:290},{x1:85,y1:340,x2:340,y2:340},{x1:85,y1:385,x2:340,y2:385},
-    {x1:140,y1:50,x2:140,y2:430},{x1:195,y1:50,x2:195,y2:430},{x1:255,y1:50,x2:255,y2:430},{x1:305,y1:50,x2:305,y2:430},
-  ];
-  return (
-    <div style={{flex:1,position:"relative",overflow:"hidden",background:"linear-gradient(135deg,#0a1628 0%,#0d1f3c 100%)"}}>
-      <svg width="100%" height="100%" viewBox="0 0 390 480" preserveAspectRatio="xMidYMid meet" style={{position:"absolute",inset:0}}>
-        {roads.map((r,i)=><line key={i} x1={r.x1} y1={r.y1} x2={r.x2} y2={r.y2} stroke="rgba(124,58,237,.13)" strokeWidth="1.5"/>)}
-        <polyline points={river.map(p=>`${p.x},${p.y}`).join(" ")} fill="none" stroke="rgba(8,145,178,.38)" strokeWidth="20" strokeLinecap="round" strokeLinejoin="round"/>
-        <polyline points={river.map(p=>`${p.x},${p.y}`).join(" ")} fill="none" stroke="rgba(8,145,178,.7)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round"/>
-        <text x="28" y="175" fill="rgba(8,145,178,.55)" fontSize="9" transform="rotate(-90,28,175)" fontFamily="monospace" letterSpacing="1">MISSISSIPPI</text>
-
-        {/* LSU Campus zone highlight */}
-        <rect x="160" y="278" width="170" height="140" rx="18" fill="rgba(70,29,124,.22)" stroke={C.lsuGold} strokeWidth="1.5" strokeDasharray="6,4"/>
-        <text x="245" y="298" textAnchor="middle" fill={C.lsuGold} fontSize="8.5" fontFamily="monospace" letterSpacing="1" opacity=".7">🐯 LSU AREA</text>
-
-        {/* Neighborhood labels */}
-        {[{x:155,y:80,t:"DOWNTOWN"},{x:215,y:105,t:"MID CITY"},{x:215,y:250,t:"PERKINS"},{x:130,y:310,t:"SOUTH BR"},{x:252,y:370,t:"LSU / TIGERLAND"}].map((n,i)=>(
-          <text key={i} x={n.x} y={n.y} fill="rgba(245,197,24,.18)" fontSize="7.5" fontFamily="monospace" letterSpacing="1">{n.t}</text>
-        ))}
-
-        {/* Event pins */}
-        {events.map(ev=>{
-          const h=hov===ev.id;
-          const pinColor = ev.lsu ? C.lsuGold : ev.color;
-          return <g key={ev.id} onClick={()=>onPick(ev)} onMouseEnter={()=>setHov(ev.id)} onMouseLeave={()=>setHov(null)} style={{cursor:"pointer"}}>
-            {h&&<circle cx={ev.lng} cy={ev.lat} r="28" fill={pinColor} opacity=".14"/>}
-            <circle cx={ev.lng} cy={ev.lat} r={h?19:13} fill={pinColor} opacity={h?1:.88} style={{transition:"all .2s",filter:`drop-shadow(0 0 ${h?14:6}px ${pinColor})`}}/>
-            <circle cx={ev.lng} cy={ev.lat} r={h?9:5.5} fill="white" opacity=".92"/>
-            <text x={ev.lng} y={ev.lat+4} textAnchor="middle" fontSize="7.5" fill={ev.lsu?C.lsuPurple:ev.color} fontFamily="monospace" fontWeight="bold">
-              {CATEGORIES.find(c=>c.id===ev.category)?.icon||"•"}
-            </text>
-            {h&&<>
-              <rect x={ev.lng-60} y={ev.lat-58} width="120" height="36" rx="8" fill="rgba(10,1,25,.97)" stroke={ev.lsu?C.lsuGold:C.gold} strokeWidth="1.2"/>
-              <text x={ev.lng} y={ev.lat-40} textAnchor="middle" fontSize="8.5" fill="white" fontFamily="monospace" fontWeight="bold">{ev.title.length>20?ev.title.slice(0,20)+"…":ev.title}</text>
-              <text x={ev.lng} y={ev.lat-26} textAnchor="middle" fontSize="8" fill={ev.lsu?C.lsuGold:C.gold} fontFamily="monospace">{ev.distance} away {ev.lsu?"· 🐯":""}</text>
-            </>}
-          </g>;
-        })}
-        {/* You are here */}
-        <circle cx="200" cy="310" r="22" fill={C.gold} opacity=".1"/>
-        <circle cx="200" cy="310" r="8" fill="none" stroke={C.gold} strokeWidth="2.5"/>
-        <circle cx="200" cy="310" r="3.5" fill={C.gold}/>
-        <text x="200" y="338" textAnchor="middle" fill={C.gold} fontSize="8" fontFamily="monospace" opacity=".6">YOU</text>
-      </svg>
-      {/* Legend */}
-      <div style={{position:"absolute",bottom:12,left:12,right:12,background:"rgba(10,1,25,.93)",borderRadius:14,border:`1px solid rgba(245,197,24,.18)`,padding:"10px 14px",backdropFilter:"blur(12px)",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-        <span style={{fontSize:11,color:C.gold,fontFamily:"monospace",letterSpacing:1}}>{events.length} EVENTS</span>
-        {CATEGORIES.map(c=><div key={c.id} style={{display:"flex",alignItems:"center",gap:4}}>
-          <div style={{width:8,height:8,borderRadius:"50%",background:c.id==="tailgate"?C.lsuGold:c.color}}/>
-          <span style={{fontSize:9,color:"rgba(255,255,255,.45)",fontFamily:"monospace"}}>{c.label}</span>
-        </div>)}
-      </div>
     </div>
   );
 }
@@ -454,6 +393,7 @@ export default function GeauxPlay() {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;800&display=swap');
         *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
         body{margin:0;padding:0;background:${C.dark};}
+        .leaflet-div-icon.geaux-leaflet-marker{background:transparent!important;border:none!important;}
         @keyframes tw{from{opacity:.06}to{opacity:.32}}
         @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
         @keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
@@ -535,7 +475,7 @@ export default function GeauxPlay() {
           <div style={{fontSize:24,fontWeight:800,color:"white",fontFamily:"'Playfair Display',serif"}}>Baton Rouge <span style={{color:C.gold}}>&</span> <span style={{color:C.lsuGold}}>LSU</span></div>
           <div style={{fontSize:13,color:"rgba(253,230,138,.45)",marginTop:3}}>Tap any pin for details · 🐯 = LSU Area</div>
         </div>
-        <MapView events={EVENTS} onPick={openEvent}/>
+        <MapView events={EVENTS} onPick={openEvent} CATEGORIES={CATEGORIES}/>
       </>}
 
       {/* ── SUBMIT TAB ── */}
