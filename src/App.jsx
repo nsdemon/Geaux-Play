@@ -342,7 +342,7 @@ function ZoneFilter({ zone, setZone }) {
 
 // ── Root App ──────────────────────────────────────────────────────────────────
 export default function GeauxPlay() {
-  const [onboarded, setOnboarded]   = useState(false);
+  const [onboarded, setOnboarded]   = useState(true);
   const [tab, setTab]               = useState("events");
   const [cat, setCat]               = useState("all");
   const [zone, setZone]             = useState("all");
