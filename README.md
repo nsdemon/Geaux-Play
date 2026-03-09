@@ -1,4 +1,34 @@
-# React + Vite
+# Geaux Play
+
+Events in Baton Rouge & LSU, Louisiana.
+
+---
+
+## After making changes — run these
+
+**Test locally**
+```bash
+npm run dev
+```
+Then open http://localhost:5173 (or the URL Vite prints).
+
+**Build for production**
+```bash
+npm run build
+```
+Output is in the `dist` folder. Optional: `npm run preview` to test the build locally.
+
+**Push to the web (update live site on Vercel)**
+```bash
+git add .
+git commit -m "Your short description of the change"
+git push origin main
+```
+If the repo is connected to Vercel, the site at geaux-play.vercel.app updates automatically.
+
+---
+
+## React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
