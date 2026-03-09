@@ -248,34 +248,20 @@ function SubmitForm({ onBack }) {
   </div>;
 }
 
-// ── Event Card ────────────────────────────────────────────────────────────────
+// ── Event Card (square, 2-col grid) ─────────────────────────────────────────────
 function EventCard({ ev, onClick }) {
   const [press, setPress] = useState(false);
   return (
     <div onClick={()=>onClick(ev)} onMouseDown={()=>setPress(true)} onMouseUp={()=>setPress(false)} onMouseLeave={()=>setPress(false)}
-      style={{background:ev.lsu?"linear-gradient(145deg,rgba(70,29,124,.55),rgba(26,5,51,.96))":"linear-gradient(145deg,rgba(59,7,100,.85),rgba(26,5,51,.96))",border:`1.5px solid ${ev.lsu?`rgba(253,208,35,.28)`:"rgba(245,197,24,.16)"}`,borderRadius:20,padding:"18px 18px 16px",cursor:"pointer",position:"relative",overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.35)",transition:"transform .15s ease",transform:press?"scale(.98)":"scale(1)"}}>
-      {/* Accent bar */}
-      <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:ev.lsu?`linear-gradient(90deg,${C.lsuPurple},${C.lsuGold})`:`linear-gradient(90deg,${ev.color},${C.gold})`,borderRadius:"20px 20px 0 0"}}/>
-      {/* Badges row */}
-      <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:6,flexWrap:"wrap"}}>
-        <div style={{fontSize:11,color:ev.lsu?C.lsuGold:C.gold,fontWeight:700,textTransform:"uppercase",letterSpacing:2,fontFamily:"monospace"}}>
-          {ev.date} · {ev.time}
-        </div>
-        {ev.lsu&&<LSUBadge/>}
-        {ev.hot&&<span style={{background:"linear-gradient(135deg,#FF6B35,#FF4500)",color:"white",fontSize:10,fontWeight:800,padding:"3px 9px",borderRadius:99,letterSpacing:1,fontFamily:"monospace"}}>🔥 HOT</span>}
+      style={{aspectRatio:"1",background:ev.lsu?"linear-gradient(145deg,rgba(70,29,124,.55),rgba(26,5,51,.96))":"linear-gradient(145deg,rgba(59,7,100,.85),rgba(26,5,51,.96))",border:`1.5px solid ${ev.lsu?`rgba(253,208,35,.28)`:"rgba(245,197,24,.16)"}`,borderRadius:16,padding:12,cursor:"pointer",position:"relative",overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.35)",transition:"transform .15s ease",transform:press?"scale(.98)":"scale(1)",display:"flex",flexDirection:"column"}}>
+      <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:ev.lsu?`linear-gradient(90deg,${C.lsuPurple},${C.lsuGold})`:`linear-gradient(90deg,${ev.color},${C.gold})`,borderRadius:"16px 16px 0 0"}}/>
+      <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4,flexWrap:"wrap"}}>
+        <span style={{fontSize:10,color:ev.lsu?C.lsuGold:C.gold,fontWeight:700,fontFamily:"monospace"}}>{ev.date}</span>
+        {ev.lsu&&<span style={{fontSize:9}}>🐯</span>}
+        {ev.hot&&<span style={{fontSize:9}}>🔥</span>}
       </div>
-      {/* Title */}
-      <div style={{fontSize:18,fontWeight:700,color:"white",fontFamily:"'Playfair Display',serif",lineHeight:1.35,marginBottom:8}}>
-        {ev.title}
-      </div>
-      {/* Location */}
-      <div style={{fontSize:13,color:"rgba(253,230,138,.65)",marginBottom:10,display:"flex",alignItems:"center",gap:4}}>
-        <span>📍</span>
-        <span style={{flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{ev.location}</span>
-        <span style={{color:ev.lsu?C.lsuGold:C.gold,fontWeight:700,fontSize:12,flexShrink:0,marginLeft:8}}>{ev.distance}</span>
-      </div>
-      {/* Description */}
-      <div style={{fontSize:14,color:"rgba(255,255,255,.52)",lineHeight:1.6}}>{ev.desc}</div>
+      <div style={{fontSize:14,fontWeight:700,color:"white",fontFamily:"'Playfair Display',serif",lineHeight:1.25,flex:1,display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{ev.title}</div>
+      <div style={{fontSize:11,color:"rgba(253,230,138,.65)",marginTop:4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>📍 {ev.location}</div>
     </div>
   );
 }
@@ -315,29 +301,52 @@ function EventModal({ ev, onClose, tip, loadingTip }) {
   );
 }
 
-// ── Zone Filter Bar ───────────────────────────────────────────────────────────
-function ZoneFilter({ zone, setZone }) {
+// ── Filter Dropdown (top right) ────────────────────────────────────────────────
+const ZONES = [
+  { id:"all", label:"All of BR",   icon:"📍" },
+  { id:"lsu", label:"LSU Area",    icon:"🐯" },
+  { id:"br",  label:"Downtown BR", icon:"🏙" },
+];
+function FilterDropdown({ cat, setCat, zone, setZone }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div style={{display:"flex",gap:8,padding:"0 20px 10px",flexShrink:0,zIndex:10}}>
-      {[
-        {id:"all",    label:"All of BR",   icon:"📍"},
-        {id:"lsu",    label:"LSU Area",    icon:"🐯"},
-        {id:"br",     label:"Downtown BR", icon:"🏙"},
-      ].map(z=>{const on=zone===z.id; return (
-        <button key={z.id} onClick={()=>setZone(z.id)} style={{
-          display:"flex",alignItems:"center",gap:5,
-          padding:"8px 14px",borderRadius:99,
-          border:`1.5px solid ${on?(z.id==="lsu"?C.lsuGold:C.gold):"rgba(255,255,255,.1)"}`,
-          background:on?(z.id==="lsu"?`linear-gradient(135deg,${C.lsuPurple},#5a2d9e)`:`linear-gradient(135deg,${C.goldDark},${C.gold})`):"rgba(255,255,255,.05)",
-          color:on?(z.id==="lsu"?C.lsuGold:C.dark):"rgba(255,255,255,.45)",
-          fontSize:12,fontFamily:"monospace",fontWeight:on?700:400,
-          cursor:"pointer",whiteSpace:"nowrap",transition:"all .18s",flexShrink:0,
-        }}>
-          <span style={{fontSize:13}}>{z.icon}</span>{z.label}
-        </button>
-      );})}
+    <div style={{ position:"relative", flexShrink:0 }}>
+      <button onClick={()=>setOpen(!open)} style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 12px", borderRadius:12, background:"rgba(245,197,24,.12)", border:`1.5px solid rgba(245,197,24,.25)`, color:C.gold, fontSize:13, fontFamily:"monospace", cursor:"pointer", fontWeight:600 }}>
+        <span>⚙</span> Filters
+      </button>
+      {open&&<>
+        <div style={{ position:"fixed", inset:0, zIndex:40 }} onClick={()=>setOpen(false)}/>
+        <div style={{ position:"absolute", top:"100%", right:0, marginTop:6, minWidth:200, background:"linear-gradient(180deg,#1e0a3c,#0D0120)", border:`1.5px solid rgba(245,197,24,.3)`, borderRadius:14, padding:12, boxShadow:"0 8px 32px rgba(0,0,0,.5)", zIndex:50 }}>
+          <div style={{ fontSize:10, color:C.gold, fontFamily:"monospace", letterSpacing:2, marginBottom:8 }}>CATEGORY</div>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom:12 }}>
+            {ALL_CATS.map(c=>{const on=cat===c.id; return (
+              <button key={c.id} onClick={()=>{ setCat(c.id); setOpen(false); }} style={{ padding:"6px 10px", borderRadius:8, border:`1px solid ${on?C.gold:"rgba(255,255,255,.1)"}`, background:on?`${c.color}44`:"rgba(255,255,255,.05)", color:on?"white":"rgba(255,255,255,.6)", fontSize:11, cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>
+                <span>{c.icon}</span>{c.label}
+              </button>
+            );})}
+          </div>
+          <div style={{ fontSize:10, color:C.gold, fontFamily:"monospace", letterSpacing:2, marginBottom:8 }}>AREA</div>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+            {ZONES.map(z=>{const on=zone===z.id; return (
+              <button key={z.id} onClick={()=>{ setZone(z.id); setOpen(false); }} style={{ padding:"6px 12px", borderRadius:8, border:`1px solid ${on?(z.id==="lsu"?C.lsuGold:C.gold):"rgba(255,255,255,.1)"}`, background:on?(z.id==="lsu"?`rgba(70,29,124,.5)`:"rgba(245,197,24,.2)"):"rgba(255,255,255,.05)", color:on?(z.id==="lsu"?C.lsuGold:C.gold):"rgba(255,255,255,.6)", fontSize:12, cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>
+                <span>{z.icon}</span>{z.label}
+              </button>
+            );})}
+          </div>
+        </div>
+      </>}
     </div>
   );
+}
+
+// Parse "Mar 14–16" or "Apr 5" -> sortable number (20250314)
+function dateSortKey(dateStr) {
+  const m = { Jan:1, Feb:2, Mar:3, Apr:4, May:5, Jun:6, Jul:7, Aug:8, Sep:9, Oct:10, Nov:11, Dec:12 };
+  const match = dateStr.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d+)/);
+  if (!match) return 99999999;
+  const month = m[match[1]]||12;
+  const day = parseInt(match[2],10)||1;
+  return 2025*10000 + month*100 + day;
 }
 
 // ── Root App ──────────────────────────────────────────────────────────────────
@@ -376,9 +385,7 @@ export default function GeauxPlay() {
     const mz = zone==="all" || (zone==="lsu"&&e.lsu) || (zone==="br"&&!e.lsu);
     const ms = !search || e.title.toLowerCase().includes(search.toLowerCase()) || e.location.toLowerCase().includes(search.toLowerCase());
     return mc&&mz&&ms;
-  });
-
-  const lsuCount = EVENTS.filter(e=>e.lsu).length;
+  }).sort((a,b)=>dateSortKey(a.date)-dateSortKey(b.date));
 
   const TABS=[
     {id:"events",icon:"✦",label:"Events"},
@@ -410,61 +417,26 @@ export default function GeauxPlay() {
 
       {/* ── EVENTS TAB ── */}
       {tab==="events"&&<>
-        <div style={{padding:"max(env(safe-area-inset-top),16px) 20px 0",flexShrink:0,zIndex:10}}>
-          {/* Header */}
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:4}}>
+        <div style={{padding:"max(env(safe-area-inset-top),16px) 20px 12px",flexShrink:0,zIndex:10}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <div style={{width:40,height:40,borderRadius:12,background:`linear-gradient(135deg,${C.goldDark},${C.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:900,color:C.dark,fontFamily:"'Playfair Display',serif",boxShadow:`0 0 16px rgba(245,197,24,.45)`,flexShrink:0}}>G</div>
               <div>
                 <div style={{fontSize:26,fontWeight:900,color:"white",fontFamily:"'Playfair Display',serif",lineHeight:1,letterSpacing:-.5}}>Geaux <span style={{color:C.gold}}>Play</span></div>
-                <div style={{fontSize:12,color:"rgba(253,230,138,.5)",marginTop:2}}>📍 Baton Rouge · 🐯 LSU Area</div>
+                <div style={{fontSize:12,color:"rgba(253,230,138,.5)",marginTop:2}}>{filtered.length} events</div>
               </div>
             </div>
-            <button onClick={()=>setNotifs([NOTIFS[Math.floor(Math.random()*NOTIFS.length)]])} style={{width:42,height:42,borderRadius:13,background:"rgba(245,197,24,.1)",border:`1.5px solid rgba(245,197,24,.2)`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:20,flexShrink:0}}>🔔</button>
-          </div>
-          {/* Search */}
-          <div style={{marginTop:12,background:"rgba(255,255,255,.06)",border:"1.5px solid rgba(245,197,24,.13)",borderRadius:14,padding:"12px 15px",display:"flex",alignItems:"center",gap:10}}>
-            <span style={{color:"rgba(245,197,24,.45)",fontSize:16,flexShrink:0}}>🔍</span>
-            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search events, venues, LSU..." style={{background:"none",border:"none",outline:"none",color:"white",fontSize:15,flex:1,fontFamily:"system-ui",minWidth:0}}/>
-            {search&&<button onClick={()=>setSearch("")} style={{background:"none",border:"none",color:"rgba(245,197,24,.45)",cursor:"pointer",fontSize:16,padding:0,flexShrink:0}}>✕</button>}
+            <div style={{display:"flex",alignItems:"center",gap:8}}>
+              <FilterDropdown cat={cat} setCat={setCat} zone={zone} setZone={setZone}/>
+              <button onClick={()=>setNotifs([NOTIFS[Math.floor(Math.random()*NOTIFS.length)]])} style={{width:42,height:42,borderRadius:13,background:"rgba(245,197,24,.1)",border:`1.5px solid rgba(245,197,24,.2)`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:20,flexShrink:0}}>🔔</button>
+            </div>
           </div>
         </div>
 
-        {/* LSU Area promo banner */}
-        {zone==="all"&&<div onClick={()=>setZone("lsu")} style={{margin:"10px 20px 0",background:`linear-gradient(135deg,rgba(70,29,124,.5),rgba(91,45,158,.3))`,border:`1.5px solid ${C.lsuGold}44`,borderRadius:14,padding:"12px 15px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",flexShrink:0,zIndex:10}}>
-          <span style={{fontSize:26,flexShrink:0}}>🐯</span>
-          <div style={{flex:1,minWidth:0}}>
-            <div style={{fontSize:13,fontWeight:700,color:C.lsuGold,fontFamily:"'Playfair Display',serif"}}>LSU Area Events</div>
-            <div style={{fontSize:12,color:"rgba(255,255,255,.5)",marginTop:1}}>{lsuCount} events near campus · Tigerland · The Parade · LSU Lakes</div>
-          </div>
-          <div style={{fontSize:13,color:C.lsuGold,fontFamily:"monospace",flexShrink:0}}>See all →</div>
-        </div>}
-
-        {/* Zone filter */}
-        <div style={{paddingTop:10,flexShrink:0,zIndex:10}}>
-          <ZoneFilter zone={zone} setZone={setZone}/>
-        </div>
-
-        {/* Category pills */}
-        <div style={{display:"flex",gap:9,padding:"0 20px 10px",overflowX:"auto",scrollbarWidth:"none",flexShrink:0,zIndex:10}}>
-          {ALL_CATS.map(c=>{const on=cat===c.id;return(
-            <button key={c.id} onClick={()=>setCat(c.id)} style={{display:"flex",alignItems:"center",gap:6,padding:"9px 16px",borderRadius:99,border:`2px solid ${on?C.gold:"rgba(245,197,24,.15)"}`,background:on?`linear-gradient(135deg,${C.goldDark},${C.gold})`:"rgba(91,33,182,.22)",color:on?C.dark:C.goldLight,fontFamily:"'Playfair Display',serif",fontWeight:on?700:400,fontSize:13,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0,transition:"all .18s"}}>
-              <span style={{fontSize:14}}>{c.icon}</span>{c.label}
-            </button>
-          );})}
-        </div>
-
-        {/* Count */}
-        <div style={{padding:"0 20px 8px",flexShrink:0,zIndex:10}}>
-          <span style={{fontSize:11,color:"rgba(253,230,138,.4)",fontFamily:"monospace",letterSpacing:1.5}}>
-            {filtered.length} EVENTS {zone==="lsu"?"NEAR LSU":zone==="br"?"IN DOWNTOWN BR":"NEAR YOU"}
-          </span>
-        </div>
-
-        {/* Feed */}
-        <div style={{flex:1,overflowY:"auto",padding:"0 20px 20px",display:"flex",flexDirection:"column",gap:13,zIndex:10}}>
+        {/* Feed — 2 columns, square cards, sorted by date */}
+        <div style={{flex:1,overflowY:"auto",padding:"0 16px 20px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,zIndex:10}}>
           {filtered.map(ev=><EventCard key={ev.id} ev={ev} onClick={openEvent}/>)}
-          {!filtered.length&&<div style={{textAlign:"center",padding:"50px 0",color:"rgba(245,197,24,.32)",fontFamily:"monospace",fontSize:14}}>No events found. Try a different filter!</div>}
+          {!filtered.length&&<div style={{gridColumn:"1/-1",textAlign:"center",padding:"50px 0",color:"rgba(245,197,24,.32)",fontFamily:"monospace",fontSize:14}}>No events found. Try a different filter!</div>}
         </div>
       </>}
 
@@ -494,13 +466,25 @@ export default function GeauxPlay() {
         <button onClick={()=>setTab("events")} style={{background:`linear-gradient(135deg,${C.goldDark},${C.gold})`,border:"none",borderRadius:14,padding:"15px 36px",color:C.dark,fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:800,cursor:"pointer"}}>Browse Events</button>
       </div>}
 
-      {/* ── Bottom Nav ── */}
+      {/* ── Bottom Nav (Events | Map | Search | Submit | Saved) ── */}
       <div style={{flexShrink:0,zIndex:20,background:`linear-gradient(0deg,${C.dark} 70%,transparent)`,paddingBottom:`env(safe-area-inset-bottom,12px)`}}>
-        <div style={{display:"flex",justifyContent:"space-around",padding:"10px 16px 8px"}}>
-          {TABS.map(t=>{const on=tab===t.id;return(
-            <div key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5,cursor:"pointer",flex:1}}>
-              <div style={{width:48,height:48,borderRadius:15,background:on?`linear-gradient(135deg,${C.goldDark},${C.gold})`:"rgba(255,255,255,.06)",border:on?"none":"1.5px solid rgba(245,197,24,.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,color:on?C.dark:"rgba(245,197,24,.4)",fontWeight:on?900:400,boxShadow:on?`0 4px 18px rgba(245,197,24,.32)`:"none",transition:"all .2s"}}>{t.icon}</div>
-              <span style={{fontSize:11,color:on?C.gold:"rgba(255,255,255,.25)",fontFamily:"monospace",letterSpacing:.4}}>{t.label}</span>
+        <div style={{display:"flex",alignItems:"center",gap:6,padding:"8px 12px 10px"}}>
+          {TABS.slice(0,2).map(t=>{const on=tab===t.id;return(
+            <div key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,cursor:"pointer",flexShrink:0}}>
+              <div style={{width:44,height:44,borderRadius:12,background:on?`linear-gradient(135deg,${C.goldDark},${C.gold})`:"rgba(255,255,255,.06)",border:on?"none":"1.5px solid rgba(245,197,24,.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:on?C.dark:"rgba(245,197,24,.4)",fontWeight:on?900:400,boxShadow:on?`0 4px 18px rgba(245,197,24,.32)`:"none",transition:"all .2s"}}>{t.icon}</div>
+              <span style={{fontSize:10,color:on?C.gold:"rgba(255,255,255,.25)",fontFamily:"monospace"}}>{t.label}</span>
+            </div>
+          );})}
+          {/* Search bar — between Map and Submit */}
+          <div style={{flex:1,minWidth:0,background:"rgba(255,255,255,.06)",border:"1.5px solid rgba(245,197,24,.2)",borderRadius:12,padding:"10px 14px",display:"flex",alignItems:"center",gap:8}}>
+            <span style={{color:"rgba(245,197,24,.5)",fontSize:14,flexShrink:0}}>🔍</span>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search events, venues..." style={{background:"none",border:"none",outline:"none",color:"white",fontSize:14,flex:1,fontFamily:"system-ui",minWidth:0}}/>
+            {search&&<button onClick={()=>setSearch("")} style={{background:"none",border:"none",color:"rgba(245,197,24,.5)",cursor:"pointer",fontSize:14,padding:0,flexShrink:0}}>✕</button>}
+          </div>
+          {TABS.slice(2).map(t=>{const on=tab===t.id;return(
+            <div key={t.id} onClick={()=>setTab(t.id)} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,cursor:"pointer",flexShrink:0}}>
+              <div style={{width:44,height:44,borderRadius:12,background:on?`linear-gradient(135deg,${C.goldDark},${C.gold})`:"rgba(255,255,255,.06)",border:on?"none":"1.5px solid rgba(245,197,24,.12)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:on?C.dark:"rgba(245,197,24,.4)",fontWeight:on?900:400,boxShadow:on?`0 4px 18px rgba(245,197,24,.32)`:"none",transition:"all .2s"}}>{t.icon}</div>
+              <span style={{fontSize:10,color:on?C.gold:"rgba(255,255,255,.25)",fontFamily:"monospace"}}>{t.label}</span>
             </div>
           );})}
         </div>
