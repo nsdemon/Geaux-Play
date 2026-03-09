@@ -253,15 +253,15 @@ function EventCard({ ev, onClick }) {
   const [press, setPress] = useState(false);
   return (
     <div onClick={()=>onClick(ev)} onMouseDown={()=>setPress(true)} onMouseUp={()=>setPress(false)} onMouseLeave={()=>setPress(false)}
-      style={{aspectRatio:"1",background:ev.lsu?"linear-gradient(145deg,rgba(70,29,124,.55),rgba(26,5,51,.96))":"linear-gradient(145deg,rgba(59,7,100,.85),rgba(26,5,51,.96))",border:`1.5px solid ${ev.lsu?`rgba(253,208,35,.28)`:"rgba(245,197,24,.16)"}`,borderRadius:16,padding:12,cursor:"pointer",position:"relative",overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.35)",transition:"transform .15s ease",transform:press?"scale(.98)":"scale(1)",display:"flex",flexDirection:"column"}}>
+      style={{aspectRatio:"0.85",minHeight:160,background:ev.lsu?"linear-gradient(145deg,rgba(70,29,124,.55),rgba(26,5,51,.96))":"linear-gradient(145deg,rgba(59,7,100,.85),rgba(26,5,51,.96))",border:`1.5px solid ${ev.lsu?`rgba(253,208,35,.28)`:"rgba(245,197,24,.16)"}`,borderRadius:16,padding:14,cursor:"pointer",position:"relative",overflow:"hidden",boxShadow:"0 4px 20px rgba(0,0,0,.35)",transition:"transform .15s ease",transform:press?"scale(.98)":"scale(1)",display:"flex",flexDirection:"column"}}>
       <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:ev.lsu?`linear-gradient(90deg,${C.lsuPurple},${C.lsuGold})`:`linear-gradient(90deg,${ev.color},${C.gold})`,borderRadius:"16px 16px 0 0"}}/>
-      <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:4,flexWrap:"wrap"}}>
-        <span style={{fontSize:10,color:ev.lsu?C.lsuGold:C.gold,fontWeight:700,fontFamily:"monospace"}}>{ev.date}</span>
-        {ev.lsu&&<span style={{fontSize:9}}>🐯</span>}
-        {ev.hot&&<span style={{fontSize:9}}>🔥</span>}
+      <div style={{display:"flex",alignItems:"center",gap:4,marginBottom:6,flexWrap:"wrap"}}>
+        <span style={{fontSize:11,color:ev.lsu?C.lsuGold:C.gold,fontWeight:700,fontFamily:"monospace"}}>{ev.date}</span>
+        {ev.lsu&&<span style={{fontSize:10}}>🐯</span>}
+        {ev.hot&&<span style={{fontSize:10}}>🔥</span>}
       </div>
-      <div style={{fontSize:14,fontWeight:700,color:"white",fontFamily:"'Playfair Display',serif",lineHeight:1.25,flex:1,display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{ev.title}</div>
-      <div style={{fontSize:11,color:"rgba(253,230,138,.65)",marginTop:4,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>📍 {ev.location}</div>
+      <div style={{fontSize:15,fontWeight:700,color:"white",fontFamily:"'Playfair Display',serif",lineHeight:1.3,flex:1,display:"-webkit-box",WebkitLineClamp:4,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{ev.title}</div>
+      <div style={{fontSize:12,color:"rgba(253,230,138,.65)",marginTop:6,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>📍 {ev.location}</div>
     </div>
   );
 }
